@@ -1,39 +1,46 @@
-import React, { Component } from "react";
-import logo from "./logo.svg";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
-class App extends Component {
-        state = {
-                data: null,
-        };
+const App = () => {
+    const [equipmentData, setEquipmentData] = useState([]);
 
-        componentDidMount() {
-                this.getData()
-                        .then((res) => this.setState({ data: res.express }))
-                        .catch((err) => console.log(err));
-        }
+    useEffect(() => {
+        getData();
+    }, []);
 
-        getData = async () => {
-                const response = await fetch("/backend");
-                const body = await response.json();
+    const getData = () => {
+        fetch("https://reference.intellisense.io/thickenernn/v1/referencia")
+            .then((res) => res.json())
+            .then((res) => setEquipmentData(res.current.data.TK1));
 
-                if (response.status !== 200) {
-                        throw Error(body.message);
-                }
-                return body;
-        };
+        logData(equipmentData);
+    };
 
-        render() {
-                return (
-                        <div className="App">
-                                <header className="App-header">
-                                        <img src={logo} className="App-logo" alt="logo" />
-                                        <h1 className="App-title">Welcome to React</h1>
-                                </header>
-                                <p className="App-intro">{this.state.data}</p>
-                        </div>
-                );
-        }
-}
+    const logData = (equipmentData) => {
+        const equipmentKeys = Object.keys(equipmentData)
+            .filter((v) => v.startsWith("TK1_"))
+
+            equipmentKeys.forEach(key => {
+                console.log(key);
+                console.log(equipmentData[key].values[equipmentData[key].values.length - 1])
+            });
+    };
+
+    return (
+        <div>
+            <h1>Predicted Future Operation Data</h1>
+            <button onClick={getData}>Get Data</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                {/* <tbody>{logData}</tbody> */}
+            </table>
+        </div>
+    );
+};
 
 export default App;
