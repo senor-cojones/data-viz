@@ -1,10 +1,6 @@
 const express = require("express");
-const app = express();
+const router = express.Router();
 const port = process.env.PORT || 8080;
-
-app.listen(port, () =>
-    console.log(`Server started. Listening on port ${port}`)
-);
 
 const data = () => {
     fetch('https://reference.intellisense.io/thickenernn/v1/referencia')
@@ -12,6 +8,8 @@ const data = () => {
       .then((res) => setEquipmentData(res.current.data.TK1));
   };
 
-app.all("/backend", (req, res) => {
+router.all("/backend", (req, res) => {
     res.send(data);
 });
+
+module.exports = router;

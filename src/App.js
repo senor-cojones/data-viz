@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import "./reset.css";
 import "./App.css";
 
 const App = () => {
-    const [equipmentData, setEquipmentData] = useState([]);
+    const [equipmentData, setEquipmentData] = useState();
 
-    useEffect(() => {
-        getData();
-    }, []);
-
+    //Fetch data from express server and save it in state
     const getData = () => {
+        // fetch("/backend")
         fetch("https://reference.intellisense.io/thickenernn/v1/referencia")
             .then((res) => res.json())
             .then((res) => setEquipmentData(res.current.data.TK1));
@@ -16,14 +15,34 @@ const App = () => {
         logData(equipmentData);
     };
 
-    const logData = (equipmentData) => {
-        const equipmentKeys = Object.keys(equipmentData)
-            .filter((v) => v.startsWith("TK1_"))
+    const logData = () => {
+        let rows = [];
 
-            equipmentKeys.forEach(key => {
-                console.log(key);
-                console.log(equipmentData[key].values[equipmentData[key].values.length - 1])
+        if (equipmentData) {
+            //Filter out all of the keys starting with TK1_
+            const equipmentKeys = Object.keys(equipmentData).filter((v) =>
+                v.startsWith("TK1_")
+            );
+
+            equipmentKeys.forEach((equipmentKey) => {
+                const equipmentValues = equipmentData[equipmentKey].values;
+
+                rows.push(
+                    <tr key={equipmentKey}>
+                        <td>{equipmentKey}</td>
+                        <td>{equipmentValues[equipmentValues.length - 1]}</td>
+                    </tr>
+                );
             });
+        } else {
+            rows = (
+                <tr>
+                    <td>No data to report</td>
+                </tr>
+            );
+        }
+
+        return rows;
     };
 
     return (
@@ -37,7 +56,7 @@ const App = () => {
                         <th>Value</th>
                     </tr>
                 </thead>
-                {/* <tbody>{logData}</tbody> */}
+                <tbody>{logData()}</tbody>
             </table>
         </div>
     );
