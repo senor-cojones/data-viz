@@ -1,9 +1,8 @@
 const express = require("express");
-const router = express.Router();
-const port = process.env.PORT || 8080;
-
 const app = express();
+const router = express.Router();
 const PORT = process.env.PORT || 5000;
+var path = require('path');
 
 app.use(express.static(path.join(__dirname, "client", "build")));
 
@@ -17,6 +16,7 @@ const data = () => {
                 .filter(([key]) => key.startsWith("TK1_"))
                 .reduce((obj, [key, value]) => {
                     obj[key] = value;
+
                     return obj;
                 }, {});
 
@@ -28,8 +28,8 @@ router.all("/backend", (req, res) => {
     res.send(data);
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Server running on PORT ${PORT}`);
 });
 
 module.exports = router;

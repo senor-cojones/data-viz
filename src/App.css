@@ -1,0 +1,43 @@
+body {
+    display: flex;
+    margin: auto;
+    max-width: 100rem;
+    flex-direction: column;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+table {
+    border: solid 1px #ddd;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font: normal 13px Arial, sans-serif;
+}
+
+table thead th {
+    background-color: #ccc;
+    border: solid 1px #ddd;
+    padding: 10px;
+}
+
+table tbody td {
+    border: solid 1px #ddd;
+    color: #333;
+    padding: 10px;
+    text-shadow: 1px 1px 1px #fff;
+}
+
+table {
+    flex: 25%;
+}
+
+button {
+    width: fit-content;
+    height: fit-content;
+    margin: 1rem auto;
+}
+
+h1 {
+    width: 100%;
+    display: block;
+}

@@ -18,6 +18,7 @@ function App() {
                     .filter(([key]) => key.startsWith("TK1_"))
                     .reduce((obj, [key, value]) => {
                         obj[key] = value;
+
                         return obj;
                     }, {});
 
@@ -25,35 +26,19 @@ function App() {
             });
     };
 
-    const renderTable = () => {
-        return (
-            <div>
-                <h2>Metric Values</h2>
-                <button onClick={getData}>Get Data</button>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Last Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Object.entries(equipmentData).map(([key, value]) => (
-                            <tr key={key}>
-                                <td>{key}</td>
-                                <td>{value.values[value.values.length - 1]}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
+    const logData = () => {
+        return Object.entries(equipmentData).map(([key, value]) => (
+            <tr key={key}>
+                <td>{key}</td>
+                <td>{value.values[value.values.length - 1]}</td>
+            </tr>
+        ));
     };
 
-    const renderChart = () => {
+    const displayChart = () => {
         const chartOptions = {
             title: {
-                text: "TK1 Metrics Line Graph",
+                text: "TK1 Optimisation Statistics",
             },
             xAxis: {
                 title: {
@@ -71,9 +56,8 @@ function App() {
             },
             series: Object.entries(equipmentData).map(([key, value]) => ({
                 name: key,
-                data: value.values
-              })
-            ),
+                data: value.values,
+            })),
         };
 
         return (
@@ -82,10 +66,22 @@ function App() {
     };
 
     return (
-        <div>
-            {renderTable()}
-            {renderChart()}
-        </div>
+        <>
+            <h1>Predicted Future Operation Data</h1>
+            <button onClick={getData}>Get Data</button>
+            <div className="data-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>{logData()}</tbody>
+                </table>
+                <div className="chart-area">{displayChart()}</div>
+            </div>
+        </>
     );
 }
 
