@@ -1,65 +1,92 @@
 import React, { useState } from "react";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
 import "./reset.css";
 import "./App.css";
 
-const App = () => {
-    const [equipmentData, setEquipmentData] = useState();
+function App() {
+    const [equipmentData, setEquipmentData] = useState({});
 
-    //Fetch data from express server and save it in state
     const getData = () => {
         // fetch("/backend")
         fetch("https://reference.intellisense.io/thickenernn/v1/referencia")
-            .then((res) => res.json())
-            .then((res) => setEquipmentData(res.current.data.TK1));
+            .then((response) => response.json())
+            .then((response) => {
+                const tk1Data = response.current.data.TK1;
 
-        logData(equipmentData);
+                const filteredData = Object.entries(tk1Data)
+                    .filter(([key]) => key.startsWith("TK1_"))
+                    .reduce((obj, [key, value]) => {
+                        obj[key] = value;
+                        return obj;
+                    }, {});
+
+                setEquipmentData(filteredData);
+            });
     };
 
-    const logData = () => {
-        let rows = [];
+    const renderTable = () => {
+        return (
+            <div>
+                <h2>Metric Values</h2>
+                <button onClick={getData}>Get Data</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Last Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Object.entries(equipmentData).map(([key, value]) => (
+                            <tr key={key}>
+                                <td>{key}</td>
+                                <td>{value.values[value.values.length - 1]}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
 
-        if (equipmentData) {
-            //Filter out all of the keys starting with TK1_
-            const equipmentKeys = Object.keys(equipmentData).filter((v) =>
-                v.startsWith("TK1_")
-            );
+    const renderChart = () => {
+        const chartOptions = {
+            title: {
+                text: "TK1 Metrics Line Graph",
+            },
+            xAxis: {
+                title: {
+                    text: "Time",
+                },
+                categories: [0, 5, 15, 25, 35, 45, 55],
+                labels: {
+                    align: "right",
+                },
+            },
+            yAxis: {
+                title: {
+                    text: "Value",
+                },
+            },
+            series: Object.entries(equipmentData).map(([key, value]) => ({
+                name: key,
+                data: value.values
+              })
+            ),
+        };
 
-            equipmentKeys.forEach((equipmentKey) => {
-                const equipmentValues = equipmentData[equipmentKey].values;
-
-                rows.push(
-                    <tr key={equipmentKey}>
-                        <td>{equipmentKey}</td>
-                        <td>{equipmentValues[equipmentValues.length - 1]}</td>
-                    </tr>
-                );
-            });
-        } else {
-            rows = (
-                <tr>
-                    <td>No data to report</td>
-                </tr>
-            );
-        }
-
-        return rows;
+        return (
+            <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+        );
     };
 
     return (
         <div>
-            <h1>Predicted Future Operation Data</h1>
-            <button onClick={getData}>Get Data</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>{logData()}</tbody>
-            </table>
+            {renderTable()}
+            {renderChart()}
         </div>
     );
-};
+}
 
 export default App;
